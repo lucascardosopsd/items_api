@@ -1,11 +1,21 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { SignupDto } from 'src/dto/auth.dto';
+import { SigninDto, SignupDto } from 'src/dto/auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon from 'argon2';
+import { PassportStrategy } from '@nestjs/passport';
+import { Strategy } from 'passport-local';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class AuthService {
-  constructor(private prisma: PrismaService) {}
+export class AuthService extends PassportStrategy(Strategy) {
+  constructor(
+    private prisma: PrismaService,
+    private jwt: JwtService,
+    private config: ConfigService,
+  ) {
+    super();
+  }
 
   async signup(dto: SignupDto) {
     const exists = await this.prisma.user.findUnique({
@@ -28,12 +38,45 @@ export class AuthService {
       },
     });
 
-    delete user.passwordHash;
-
-    return user;
+    return this.signToken(user.id, user.email);
   }
 
-  signin() {
-    return '';
+  async signin(dto: SigninDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+    });
+
+    if (!user) {
+      throw new HttpException("User dosen't exists", HttpStatus.NOT_FOUND);
+    }
+
+    const passCheck = await argon.verify(user.passwordHash, dto.password);
+
+    if (!passCheck) {
+      throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
+    }
+
+    return this.signToken(user.id, user.email);
+  }
+
+  async signToken(
+    userId: number,
+    email: string,
+  ): Promise<{ access_token: string }> {
+    const payload = {
+      sub: userId,
+      email,
+    };
+
+    const token = await this.jwt.signAsync(payload, {
+      expiresIn: '24h',
+      secret: this.config.get('SECRET'),
+    });
+
+    return {
+      access_token: token,
+    };
   }
 }
