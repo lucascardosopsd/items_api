@@ -20,7 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prisma:pm": "yarn prisma migrate dev && npx prisma generate",
     "docker:down": "docker compose down",
-    "docker:up": "docker compose up -d"
+    "docker:up": "docker compose up -d && yarn prisma:pm"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
