@@ -18,4 +18,16 @@ export class UserService {
       data: updateUserDto,
     });
   }
+
+  async delete(id: number) {
+    const exists = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!exists) {
+      throw new HttpException('Id not found', HttpStatus.NOT_FOUND);
+    }
+
+    return await this.prisma.user.delete({
+      where: { id },
+    });
+  }
 }
