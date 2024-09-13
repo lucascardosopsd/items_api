@@ -31,7 +31,7 @@ export class AuthService extends PassportStrategy(Strategy) {
 
     const user = await this.prisma.user.create({
       data: {
-        firsName: dto.firstName,
+        firstName: dto.firstName,
         lastName: dto.lastName,
         email: dto.email,
         passwordHash: hash,
