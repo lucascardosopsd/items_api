@@ -22,7 +22,13 @@ export class ItemService {
     });
   }
 
-  update(id: number, updateItemDto: UpdateItemDto) {
+  async update(id: number, updateItemDto: UpdateItemDto) {
+    const exists = await this.prisma.item.findUnique({ where: { id } });
+
+    if (!exists) {
+      throw new HttpException('Id not found', HttpStatus.NOT_FOUND);
+    }
+
     return this.prisma.item.update({
       where: { id },
       data: updateItemDto,
