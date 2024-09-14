@@ -1,8 +1,17 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateItemDto } from 'src/dto/item/create-item.dto';
 import { JwtGuard } from 'src/guard/jwt.guard';
 import { ItemService } from './item.service';
 import { GetUser } from 'src/decorator/get-user.decorator';
+import { UpdateItemDto } from 'src/dto/item/update-item.dto';
 
 @UseGuards(JwtGuard)
 @Controller('item')
@@ -17,5 +26,10 @@ export class ItemController {
   @Post()
   create(@GetUser('id') userId: number, @Body() createUserDto: CreateItemDto) {
     return this.itemService.create(userId, createUserDto);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: number, @Body() updateItemDto: UpdateItemDto) {
+    return this.itemService.update(+id, updateItemDto);
   }
 }

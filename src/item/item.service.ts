@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateItemDto } from 'src/dto/item/create-item.dto';
+import { UpdateItemDto } from 'src/dto/item/update-item.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -18,6 +19,13 @@ export class ItemService {
         ...createItemDto,
         userId,
       },
+    });
+  }
+
+  update(id: number, updateItemDto: UpdateItemDto) {
+    return this.prisma.item.update({
+      where: { id },
+      data: updateItemDto,
     });
   }
 }
