@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateItemDto } from 'src/dto/item/create-item.dto';
 import { UpdateItemDto } from 'src/dto/item/update-item.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -27,5 +27,15 @@ export class ItemService {
       where: { id },
       data: updateItemDto,
     });
+  }
+
+  async delete(id: number) {
+    const exists = await this.prisma.item.findUnique({ where: { id } });
+
+    if (!exists) {
+      throw new HttpException('Id not found', HttpStatus.NOT_FOUND);
+    }
+
+    return this.prisma.item.delete({ where: { id } });
   }
 }

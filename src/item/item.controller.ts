@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -31,5 +32,10 @@ export class ItemController {
   @Patch(':id')
   update(@Param('id') id: number, @Body() updateItemDto: UpdateItemDto) {
     return this.itemService.update(+id, updateItemDto);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: number) {
+    return this.itemService.delete(+id);
   }
 }
