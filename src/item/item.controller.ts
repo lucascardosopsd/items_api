@@ -13,7 +13,9 @@ import { JwtGuard } from 'src/guard/jwt.guard';
 import { ItemService } from './item.service';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { UpdateItemDto } from 'src/dto/item/update-item.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth('auth')
 @UseGuards(JwtGuard)
 @Controller('item')
 export class ItemController {
