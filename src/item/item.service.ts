@@ -7,7 +7,13 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ItemService {
   constructor(private readonly prisma: PrismaService) {}
 
-  get(userId: number, id: number) {
+  async get(userId: number, id: number) {
+    const exists = await this.prisma.item.findUnique({ where: { id } });
+
+    if (!exists) {
+      throw new HttpException('Id not found', HttpStatus.NOT_FOUND);
+    }
+
     return this.prisma.item.findUnique({
       where: { id, userId },
     });
